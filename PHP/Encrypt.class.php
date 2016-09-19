@@ -2,7 +2,7 @@
 /**
  * 数据加密
  */
-namespace Lib;
+namespace Library\PHP;
 
 class Encrypt {
     /**

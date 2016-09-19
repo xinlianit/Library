@@ -1,7 +1,7 @@
 <?php 
 header("Content-type: text/html; charset=utf-8");
-use Lib\Encrypt;
-require_once '../Lib/Encrypt.class.php';
+use Library\PHP\Encrypt;
+require_once '../../PHP/Encrypt.class.php';
 
 //加密秘钥
 $secret_key     = md5('ABC');

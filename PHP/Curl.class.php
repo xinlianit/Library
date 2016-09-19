@@ -2,7 +2,7 @@
 /**
  * Curl类
  */
-namespace Lib;
+namespace Library\PHP;
 
 class Curl {
     /**

@@ -2,7 +2,7 @@
 /**
  * Redis操作类
  */
-namespace Lib;
+namespace Library\PHP;
 
 class RedisService {
     /**

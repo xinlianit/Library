@@ -2,7 +2,7 @@
 /**
  * 数据签名
  */
-namespace Lib;
+namespace Library\PHP;
 
 class Sign {
     

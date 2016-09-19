@@ -1,7 +1,7 @@
 <?php
 header("Content-type: text/html; charset=utf-8");
-use \Lib\Sign;
-require_once '../Lib/Sign.class.php';
+use Library\PHP\Sign;
+require_once '../../PHP/Sign.class.php';
 
 //签名秘钥
 $sign_key = '123456789';
