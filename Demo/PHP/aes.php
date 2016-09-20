@@ -14,14 +14,14 @@ echo '你好！<br/>';
 $data           = '你好！';
 
 //AES对象
-$Aes = Encrypt::instance( $secret_key , 'aes' );
+$Aes = Encrypt::instance( 'aes' , $secret_key );
 
 //配置AES参数
 $config = array(
     //加密字节
     'bit'       => 128,
     //加密模式
-    'mode'      => 'ecb',
+    'aes_mode'      => 'ecb',
     //使用base64二次加密
     'base64'    => true
 );
