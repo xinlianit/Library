@@ -9,6 +9,7 @@
 				<dl>
 					<dt>PHP--------------------------------------------------------------PHP库示例</dt>
 					<dd>sign.php---------------------------------------------------------数据签名 & 验签</dd>
+					<dd>cryptSign.php----------------------------------------------------crypt数据签名 & 验签</dd>
 					<dd>rsaSign.php------------------------------------------------------RSA数据签名 & 验签</dd>
 					<dd>aes.php----------------------------------------------------------aes加密解密</dd>
 					<dd>rsa.php----------------------------------------------------------rsa加密解密</dd>
@@ -62,7 +63,7 @@ if( $verify_result ){
 }
 </pre>
 
-<h4>########################################	MD5签名 & 验签	########################################</h4>
+<h4>########################################	md5|sha1|base64_encode 签名 & 验签	########################################</h4>
 <pre>
 use Library\PHP\Sign;
 require_once '../../PHP/Sign.class.php';
@@ -96,6 +97,51 @@ $sign	= $signObject->makeSign( $sign_str );
 
 //验证签名
 $verify_result = $signObject->verifySign( $data['sign'] , $data );
+
+if( $verify_result ){
+	//签名验证成功
+}else{
+	//签名验证失败
+}
+</pre>
+
+<h4>########################################	crypt签名 & 验签	########################################</h4>
+<pre>
+use Library\PHP\Sign;
+require_once '../../PHP/Sign.class.php';
+
+//签名数据
+$data = array(
+    'name'      => 'jirenyou',
+    'sex'       => 1,
+    'age'       => 88,
+    'nick'      => '风一样的男人',
+    'phone'     => '',
+    'hobby'     => json_encode(array('b','c','a','g','e')),
+    'descript'  => '帅哥一个",不解释！&&%￥！~~~',
+    'sign'      => '88GLYB7K/HZ5.'
+);
+
+//签名秘钥
+$secret_key = md5('ABC');
+
+//签名盐值
+$slat = '888888';
+
+//签名对象
+$sign_object = Sign::instance( $secret_key );
+
+//加密类型crypt
+$sign_object::$make_sign_func = 'crypt';
+
+//获取签名数据
+$sign_str   = $sign_object->getSignStr( $data );
+
+//数据签名
+$sign = $sign_object->makeSign( $sign_str , null , $slat );
+
+//签名验证
+$verify_result = $sign_object->verifySign( $data['sign'] , $data , null , $slat );
 
 if( $verify_result ){
 	//签名验证成功
