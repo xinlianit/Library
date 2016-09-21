@@ -3,17 +3,21 @@
  *                                                                                                       *
  * 数据签名                                                                                                                                                                                                                                                                                                  *
  *    一、md5|crypt|sha1|base64_encode|rsa 签名规则：                                                                                                                                                                          *
- *    1、数组按键名正序排序；如：array( 'c'=>1 , 'b'=>2 , 'a'=>9 ) 排序后  array( 'a'=>9 , 'b'=>2 , 'c'=>1 )         *
- *    2、遍历数组，排除键名为sign、值为空、值为数组的键值，连接成字符串； 如：$str = "a=9&b=2&c=1"                              *
- *    3、连接秘钥key；如：$str .= "&key=14596386c530596d93ac260985e35edf"                                     *
- *    4、（md5|crypt|sha1|base64_encode|rsa）加密字符串 ；如：md5($str)                                          *
- *    5、得到签名后，转大写输出                                                                                                                                                                                                                                                      *
+ *    1、准备一个秘钥（APP端 & 接口服务端）共用                                                                                                                                                                                                                  *
+ *    2、数组按键名正序排序；如：array( 'c'=>1 , 'b'=>2 , 'a'=>9 ) 排序后  array( 'a'=>9 , 'b'=>2 , 'c'=>1 )         *
+ *    3、遍历数组，排除键名为sign、值为空、值为数组的键值，连接成字符串； 如：$str = "a=9&b=2&c=1"                              *
+ *    4、连接秘钥key；如：$str .= "&key=14596386c530596d93ac260985e35edf"                                     *
+ *    5、（md5|crypt|sha1|base64_encode|rsa）加密字符串 ；如：md5($str)                                          *
+ *    6、得到签名后，转大写输出，发送给接口
+ *    7、接口服务端使用秘钥同样规则验签                                                                                                                                                                                                                                                      *
  *                                                                                                       *
  *    二、rsa 签名规则
- *    1、数组按键名正序排序；如：array( 'c'=>1 , 'b'=>2 , 'a'=>9 ) 排序后  array( 'a'=>9 , 'b'=>2 , 'c'=>1 )         *
- *    2、遍历数组，排除键名为sign、值为空、值为数组的键值，连接成字符串； 如：$str = "a=9&b=2&c=1"                              *
- *    3、使用RSA公钥签名 rsa_public_key.pem                                                                    *
- *    4、得到RSA签名值                                                                                                                                                                                                                                                                      *
+ *    1、上传公钥到接口服务端（也可直接发送给接口开发人）     
+ *    2、数组按键名正序排序；如：array( 'c'=>1 , 'b'=>2 , 'a'=>9 ) 排序后  array( 'a'=>9 , 'b'=>2 , 'c'=>1 )         *
+ *    3、遍历数组，排除键名为sign、值为空、值为数组的键值，连接成字符串； 如：$str = "a=9&b=2&c=1"                              *
+ *    4、使用RSA私钥签名 rsa_private_key.pem                                                                   *
+ *    5、得到RSA签名值，发送到接口
+ *    6、接口服务端使用RSA公钥验签                                                                                                                                                                                                                                               *
  *                                                                                                        *
  *********************************************************************************************************/
 namespace Library\PHP;
@@ -92,8 +96,9 @@ class Sign {
      * @param string $data                       签名数据
      * @return string|boolean
      */
-    public function rsaSign($data){
+    private function rsaSign($data){
         $key_id = openssl_get_privatekey( self::$rsa_private_key );
+        
         if( !$key_id )
             return false;
     
@@ -116,7 +121,7 @@ class Sign {
      * @param string $sign          签名值
      * @return boolean
      */
-    public function rsaVerify($data , $sign){
+    private function rsaVerify($data , $sign){
         //base64解密
         $sign = base64_decode( $sign );
         
@@ -124,8 +129,7 @@ class Sign {
         if( !isset(self::$rsa_public_key) )
             return false;
         
-        //获取公钥id
-        $key_id = openssl_get_publickey( self::$rsa_public_key );
+        $key_id = openssl_get_publickey( self::$rsa_public_key );        
         
         if( !$key_id )
             return false;

@@ -8,7 +8,8 @@
 			<dd>
 				<dl>
 					<dt>PHP--------------------------------------------------------------PHP库示例</dt>
-					<dd>sign.php---------------------------------------------------------数据签名</dd>
+					<dd>sign.php---------------------------------------------------------数据签名 & 验签</dd>
+					<dd>rsaSign.php------------------------------------------------------RSA数据签名 & 验签</dd>
 					<dd>aes.php----------------------------------------------------------aes加密解密</dd>
 					<dd>rsa.php----------------------------------------------------------rsa加密解密</dd>
 				</dl>
@@ -22,6 +23,45 @@
 
 
 <h3>使用说明：</h3>
+<h4>########################################	RSA签名 & 验签	########################################</h4>
+<pre>
+//签名对象
+$sign_object = Sign::instance();
+//签名类型：RSA
+$sign_object::$make_sign_func   = 'rsa';
+//RSA公钥
+$sign_object::$rsa_public_key   = file_get_contents( 'rsa_key/rsa_public_key.pem' );
+//RSA私钥
+$sign_object::$rsa_private_key  = file_get_contents( 'rsa_key/rsa_private_key.pem' );
+
+//签名数据
+$data = array(
+    'name'      => 'jirenyou',
+    'sex'       => 1,
+    'age'       => 88,
+    'nick'      => '风一样的男人',
+    'phone'     => '',
+    'hobby'     => json_encode(array('b','c','a','g','e')),
+    'descript'  => '帅哥一个",不解释！&&%￥！~~~',
+    'sign'      => 'rgg80vVrU0VjGNTCLM+RKuwwPUbk7Lo897o/++LknYh8W/Nlm61up2RGTlmqbo/86DwrD9DTOUvep13DmSpMBDWKhx/BSMKRJpapPdLlELnNRK0OwDY7K0iQ5peHNSkUuvaASqx5lQYpP4nnGOsljn2fjwB0KvOb5qg04Wgo3DI='
+);
+
+//获取签名数据
+$sign_str   = $sign_object->getSignStr( $data );
+
+//数据签名
+$sign = $sign_object->makeSign( $sign_str );
+
+//验证签名
+$verify_result = $sign_object->verifySign( $data['sign'] , $data );
+
+if( $verify_result ){
+	//签名验证成功
+}else{
+	//签名验证失败
+}
+</pre>
+
 <h4>########################################	MD5签名 & 验签	########################################</h4>
 <pre>
 use Library\PHP\Sign;
