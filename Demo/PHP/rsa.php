@@ -1,4 +1,7 @@
 <?php 
+/** 
+ * 参考地址：http://blog.csdn.net/clh604/article/details/20224735
+ * */
 header("Content-type: text/html; charset=utf-8");
 use Library\PHP\Encrypt;
 require_once '../../PHP/Encrypt.class.php';
@@ -14,7 +17,7 @@ $Rsa = Encrypt::instance( 'rsa' );
 //设置参数
 $param = array(
     //使用私钥加密
-    'rsa_mode'          => 'PRIVATE',
+    'rsa_mode'          => 'private',
     //公钥
     'public_key'        => file_get_contents( 'rsa_key/rsa_public_key.pem' ),
     //私钥

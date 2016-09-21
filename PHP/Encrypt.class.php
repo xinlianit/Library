@@ -263,12 +263,16 @@ class Encrypt {
             case 'PUBLIC':
                 $encrypt_rs = openssl_public_encrypt( $data , $crypted , $this->_rsa_public_key );
                 
+                openssl_free_key( $this->_rsa_public_key );
+                
                 if( !$encrypt_rs )
                     return false;
                 break;
             //私钥加密
             case 'PRIVATE':
                 $encrypt_rs = openssl_private_encrypt( $data , $crypted , $this->_rsa_private_key );
+                
+                openssl_free_key( $this->_rsa_private_key );
                 
                 if( !$encrypt_rs )
                     return false;
@@ -303,12 +307,16 @@ class Encrypt {
             case 'PUBLIC':
                 $decrypted_rs = openssl_private_decrypt( $data , $decrypted , $this->_rsa_private_key );
                 
+                openssl_free_key( $this->_rsa_private_key );
+                
                 if( !$decrypted_rs )
                     return false;
                 break;
             //私钥解密
             case 'PRIVATE':
                 $decrypted_rs = openssl_public_decrypt( $data , $decrypted , $this->_rsa_public_key );
+                
+                openssl_free_key( $this->_rsa_public_key );
                 
                 if( !$decrypted_rs )
                     return false;
