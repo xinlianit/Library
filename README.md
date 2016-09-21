@@ -17,7 +17,17 @@
 			</dd>
 		</dl>
 	</dd>
-	<dd>PHP--------------------------------------------------------------PHP程序库</dd>
+	<dd>
+		<dd>
+				<dl>
+					<dt>PHP--------------------------------------------------------------PHP程序库</dt>
+					<dd>Curl.class.php---------------------------------------------------CURL 类</dd>
+					<dd>Encrypt.class.php------------------------------------------------（AES & RSA）加密类</dd>
+					<dd>RedisService.class.php-------------------------------------------Redis 类</dd>
+					<dd>Sign.class.php---------------------------------------------------（RSA & md5|crypt|sha1|base64_encode）签名&验签类</dd>
+				</dl>
+			</dd>
+	</dd>
 	<dd>Python-----------------------------------------------------------Python程序库</dd>
 	<dd>Java--------------------------------------------------------------Java程序库</dd>
 </dl>
@@ -148,6 +158,92 @@ if( $verify_result ){
 }else{
 	//签名验证失败
 }
+</pre>
+
+<h4>################################# AES加密 & 解密	##################################</h4>
+<pre>
+//加密秘钥
+$secret_key     = md5('ABC');
+
+//AES对象
+$Aes = Encrypt::instance( 'aes' , $secret_key );
+
+//配置AES参数
+$config = array(
+    //加密字节；128|192|256
+    'bit'       => 128,
+    //加密模式；CFB|CBC|NOFB|OFB|STREAM|ECB
+    'aes_mode'      => 'ecb',
+    //使用base64二次加密
+    'base64'    => true
+);
+$Aes->setParam( $config );
+
+//加密数据
+$data           = '你好！';
+
+//AES加密
+$encrypt_result = $Aes->encode( $data );
+
+//AES解密
+$decrypt_result = $Aes->decode( $encrypt_result );
+
+
+echo '<h3>秘钥：</h3>';
+echo md5('ABC').'<br/>';
+
+//要加密的数据
+echo '<h3>要加密的数据：</h3>';
+echo $data.'<br/>';
+
+echo '<h3>加密后的数据：</h3>';
+echo $encrypt_result . '<br/>';
+
+echo '<h3>解密后的数据：</h3>';
+echo $decrypt_result . '<br/>';
+</pre>
+
+<h4>################################# RSA加密 & 解密	##################################</h4>
+<pre>
+use Library\PHP\Encrypt;
+require_once '../../PHP/Encrypt.class.php';
+
+//Rsa对象
+$Rsa = Encrypt::instance( 'rsa' );
+
+//设置参数
+$param = array(
+    //使用私钥加密；private|public
+    'rsa_mode'          => 'private',
+    //公钥
+    'public_key'        => file_get_contents( 'rsa_key/rsa_public_key.pem' ),
+    //私钥
+    'private_key'       => file_get_contents( 'rsa_key/rsa_private_key.pem' ),
+    //使用base64二次加密
+    'base64'            => true
+);
+
+//设置加密参数
+$Rsa->setParam( $param );
+
+//要加密的数据
+$data           = '你好！';
+
+//Rsa加密
+$encrypt_result = $Rsa->encode( $data );
+
+//Rsa解密
+$decrypt_result = $Rsa->decode( $encrypt_result );
+
+
+echo '<h3>要加密的数据：</h3>';
+echo $data.'<br/>';
+
+echo '<h3>加密后的数据：</h3>';
+echo $encrypt_result . '<br/>';
+
+echo '<h3>解密后的数据：</h3>';
+echo $decrypt_result . '<br/>';
 </pre>
 
 
