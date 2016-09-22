@@ -13,6 +13,8 @@
 					<dd>rsaSign.php------------------------------------------------------RSA数据签名 & 验签</dd>
 					<dd>aes.php----------------------------------------------------------aes加密解密</dd>
 					<dd>rsa.php----------------------------------------------------------rsa加密解密</dd>
+					<dd>redis_subscribe.php----------------------------------------------redis消息订阅</dd>
+					<dd>redis_publish.php------------------------------------------------redis消息发布</dd>
 				</dl>
 			</dd>
 		</dl>
@@ -274,6 +276,58 @@ var_dump( $post_result );
 var_dump( $get_result );
 </pre>
 
+<h4>################################# REDIS消息订阅 ##################################</h4>
+<pre>
+use Library\PHP\RedisService;
+require_once '../../PHP/RedisService.class.php';
+
+//频道名称
+$channel_name = 'shop_id_1';
+
+//Redis实例
+$redisServer = RedisService::instance( '192.168.3.100' , '6379' , 'redis123' );
+
+
+//频道名称
+$channel_name = 'shop_id_1';
+
+try{
+    //订阅消息
+    $message = $redisServer->subscribe( array($channel_name) , 'outputMsg');
+}catch(Exception $e){
+    var_dump($e);
+    exit("error!");
+}
+
+//输出消息
+function outputMsg($redis , $channel , $message){
+      echo $channel , "==>" , $message , PHP_EOL;
+}
+</pre>
+
+<h4>################################# REDIS消息发布 ##################################</h4>
+<pre>
+use Library\PHP\RedisService;
+require_once '../../PHP/RedisService.class.php';
+
+//频道名称
+$channel_name = 'shop_id_1';
+
+//消息
+$message = "你好！".mt_rand(1000,9999);
+
+//Redis实例
+$redisServer = RedisService::instance( '192.168.3.100' , '6379' , 'redis123' );
+
+//发布消息
+$publish_result = $redisServer->publish( $channel_name , $message );
+
+if( $publish_result ){
+    echo "send Success !";
+}else{
+    echo "send Fail!";
+}
+</pre>
 
 
 

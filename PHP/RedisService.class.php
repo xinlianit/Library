@@ -47,6 +47,26 @@ class RedisService {
     }
     
     /**
+     * 订阅消息
+     * @param string $channel           频道名称
+     * @param string $callback          回调函数
+     * @return string 
+     */
+    public function subscribe($channel , $callback){
+        self::$connect->subscribe( array($channel)  , $callback);
+    }
+    
+    /**
+     * 发布消息
+     * @param string $channel          频道名称
+     * @param string $message          消息
+     * @return boolean
+     */
+    public function publish($channel , $message){
+        return self::$connect->publish( $channel , $message );
+    }
+    
+    /**
      * 当前实例
      * @param unknown $host
      * @param unknown $port
