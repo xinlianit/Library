@@ -53,7 +53,7 @@ class ZooKeeper implements \Kafka\ClusterMetaData
     /**
      * register consumer
      */
-    const REG_CONSUMER = '/consumers/%s/ids';
+    const REG_CONSUMER = '/consumers/%s/ids/%s';
 
     /**
      * list consumer
@@ -63,7 +63,7 @@ class ZooKeeper implements \Kafka\ClusterMetaData
     /**
      * partition owner
      */
-    const PARTITION_OWNER = '/consumers/%s/owners/%s';
+    const PARTITION_OWNER = '/consumers/%s/owners/%s/%d';
 
     // }}}
     // {{{ members
@@ -76,23 +76,10 @@ class ZooKeeper implements \Kafka\ClusterMetaData
      */
     private $zookeeper = null;
 
-    /**
-     * @var Callback container
-     */
-    private $callback = array();
-
     // }}}
     // {{{ functions
     // {{{ public function __construct()
 
-    /**
-     * Cached list of all kafka brokers
-     *
-     * @var array
-     * @access private
-     */
-    private $brokers = array();
-    
     /**
      * __construct
      *
@@ -103,14 +90,10 @@ class ZooKeeper implements \Kafka\ClusterMetaData
     public function __construct($hostList, $timeout = null)
     {
         if (!is_null($timeout) && is_numeric($timeout)) {
-            //$this->zookeeper = new \ZooKeeper($hostList, null, $timeout);
-            $this->zookeeper = new \Kafka\ZooKeeper($hostList, null, $timeout);
+            $this->zookeeper = new \ZooKeeper($hostList, null, $timeout);
         } else {
-            //$this->zookeeper = new \ZooKeeper($hostList);
-            $hostList = "192.168.3.100:2181";
-            $this->zookeeper = new \Kafka\ZooKeeper($hostList);
+            $this->zookeeper = new \ZooKeeper($hostList);
         }
-        
     }
 
     // }}}
@@ -124,23 +107,19 @@ class ZooKeeper implements \Kafka\ClusterMetaData
      */
     public function listBrokers()
     {
-        // If broker cache hasn't been populated
-        if (count($this->brokers) == 0) {
-            // Populate broker cache
-            $result = array();
-            $lists = $this->zookeeper->getChildren(self::BROKER_PATH);
-            if (!empty($lists)) {
-                foreach ($lists as $brokerId) {
-                    $brokerDetail = $this->getBrokerDetail($brokerId);
-                    if (!$brokerDetail) {
-                        continue;
-                    }
-                    $result[$brokerId] = $brokerDetail;
+        $result = array();
+        $lists = $this->zookeeper->getChildren(self::BROKER_PATH);
+        if (!empty($lists)) {
+            foreach ($lists as $brokerId) {
+                $brokerDetail = $this->getBrokerDetail($brokerId);
+                if (!$brokerDetail) {
+                    continue;
                 }
+                $result[$brokerId] = $brokerDetail;
             }
-            $this->brokers = $result;
         }
-        return $this->brokers;
+
+        return $result;
     }
 
     // }}}
@@ -237,7 +216,7 @@ class ZooKeeper implements \Kafka\ClusterMetaData
             return;
         }
 
-        $path = sprintf(self::REG_CONSUMER, (string) $groupId);
+        $path = sprintf(self::REG_CONSUMER, (string) $groupId, (string) $consumerId);
         $subData = array();
         foreach ($topics as $topic) {
             $subData[$topic] = 1;
@@ -249,16 +228,10 @@ class ZooKeeper implements \Kafka\ClusterMetaData
         );
         if (!$this->zookeeper->exists($path)) {
             $this->makeZkPath($path);
-        }
-        $consumerPath = $path . '/' . $consumerId;
-        if (!$this->zookeeper->exists($consumerPath)) {
-            $this->makeZkPath($consumerPath);
-            //jirenyou
-            $this->makeZkNode($consumerPath, json_encode($data), \Kafka\ZooKeeper::EPHEMERAL);
+            $this->makeZkNode($path, json_encode($data));
         } else {
-            $this->zookeeper->set($consumerPath, json_encode($data));
+            $this->zookeeper->set($path, json_encode($data));
         }
-//var_dump($this->zookeeper->getChildren($path));
     }
 
     // }}}
@@ -274,7 +247,11 @@ class ZooKeeper implements \Kafka\ClusterMetaData
     public function listConsumer($groupId)
     {
         $path = sprintf(self::LIST_CONSUMER, (string) $groupId);
-        return $this->zookeeper->getChildren($path);
+        if (!$this->zookeeper->exists($path)) {
+            return array();
+        } else {
+            return $this->zookeeper->getChildren($path);
+        }
     }
 
     // }}}
@@ -296,7 +273,7 @@ class ZooKeeper implements \Kafka\ClusterMetaData
 
         $topics = array();
         foreach ($consumers as $consumerId) {
-            $path = sprintf(self::REG_CONSUMER, (string) $groupId) . '/' . $consumerId;
+            $path = sprintf(self::REG_CONSUMER, (string) $groupId, (string) $consumerId);
             if (!$this->zookeeper->exists($path)) {
                 continue;
             }
@@ -327,17 +304,13 @@ class ZooKeeper implements \Kafka\ClusterMetaData
      */
     public function addPartitionOwner($groupId, $topicName, $partitionId, $consumerId)
     {
-        $path = sprintf(self::PARTITION_OWNER, (string) $groupId, $topicName);
+        $path = sprintf(self::PARTITION_OWNER, (string) $groupId, $topicName, (string) $partitionId);
         if (!$this->zookeeper->exists($path)) {
             $this->makeZkPath($path);
+            $this->makeZkNode($path, $consumerId);
+        } else {
+            $this->zookeeper->set($path, $consumerId);
         }
-        $partitionPath = $path . '/' . $partitionId;
-        if (!$this->zookeeper->exists($partitionPath)) {
-            $this->makeZkPath($partitionPath);
-            $this->makeZkNode($partitionPath, $consumerId, \ZooKeeper::EPHEMERAL);
-        }
-
-        // if exists path other comsumer
     }
 
     // }}}
@@ -375,7 +348,7 @@ class ZooKeeper implements \Kafka\ClusterMetaData
      *
      * @return bool
      */
-    protected function makeZkNode($path, $value, $flag = null)
+    protected function makeZkNode($path, $value)
     {
         $params = array(
             array(
@@ -384,97 +357,7 @@ class ZooKeeper implements \Kafka\ClusterMetaData
                 'id'     => 'anyone',
             )
         );
-        return $this->zookeeper->create($path, $value, $params, $flag);
-    }
-
-    // }}}
-    // {{{ public function watch()
-
-    /**
-     * Wath a given path
-     * @param string $path the path to node
-     * @param callable $callback callback function
-     * @return string|null
-     */
-    public function watch($path, $callback)
-    {
-        if (!is_callable($callback)) {
-            return null;
-        }
-
-        if ($this->zookeeper->exists($path)) {
-            if (!isset($this->callback[$path])) {
-                $this->callback[$path] = array();
-            }
-            if (!in_array($callback, $this->callback[$path])) {
-                $this->callback[$path][] = $callback;
-                return $this->zookeeper->getChildren($path, array($this, 'watchCallback'));
-            }
-        }
-    }
-
-    // }}}
-    // {{{ public function watchCallback()
-
-    /**
-     * Wath event callback warper
-     * @param int $event_type
-     * @param int $stat
-     * @param string $path
-     * @return the return of the callback or null
-     */
-    public function watchCallback($event_type, $stat, $path)
-    {
-        if (!isset($this->callback[$path])) {
-            return null;
-        }
-
-        foreach ($this->callback[$path] as $callback) {
-            $this->zookeeper->getChildren($path, array($this, 'watchCallback'));
-            return call_user_func($callback);
-        }
-    }
-
-    // }}}
-    // {{{ public function cancelWatch()
-
-    /**
-     * Delete watch callback on a node, delete all callback when $callback is null
-     * @param string $path
-     * @param callable $callback
-     * @return boolean|NULL
-     */
-    public function cancelWatch($path, $callback = null)
-    {
-        if (isset($this->callback[$path])) {
-            if (empty($callback)) {
-                unset($this->callback[$path]);
-                $this->zookeeper->get($path); //reset the callback
-                return true;
-            } else {
-                $key = array_search($callback, $this->callback[$path]);
-                if ($key !== false) {
-                    unset($this->callback[$path][$key]);
-                    return true;
-                } else {
-                    return null;
-                }
-            }
-        } else {
-            return null;
-        }
-    }
-
-    // }}}
-    // {{{ public function refreshMetadata()
-
-    /**
-     * Clear internal caches
-     * @return null
-     */
-    public function refreshMetadata()
-    {
-        $this->brokers = array();
+        return $this->zookeeper->create($path, $value, $params);
     }
 
     // }}}

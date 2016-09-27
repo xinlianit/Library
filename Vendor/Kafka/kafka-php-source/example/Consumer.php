@@ -1,15 +1,12 @@
 <?php
 require 'autoloader.php';
-
 class LogWriter {
 	public function log($message, $level) {
 		echo $message, PHP_EOL;
 	}
 }
-
 $log = new LogWriter;
 \Kafka\Log::setLog($log);
-
 $zookeeperList = getenv('ZOOKEEPER_LIST'); 
 $consumer = \Kafka\Consumer::getInstance($zookeeperList);
 $group = 'testgroup1';

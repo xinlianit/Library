@@ -177,7 +177,7 @@ class Kafka_SimpleConsumer
 		$this->connect();
 		// send request
 		$req->writeTo($this->socket);
-
+		
 		// get response
 		$this->lastResponseSize = $this->getResponseSize();
 		$responseCode           = $this->getResponseCode();

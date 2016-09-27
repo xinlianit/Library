@@ -9,7 +9,7 @@
     "homepage": "http://www.swanlinux.net",
     "license": "BSD-3-Clause",
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.3",
     },
     "autoload": {
         "psr-0": {
@@ -25,5 +25,5 @@
         "satooshi/php-coveralls": "dev-master",
         "phpunit/phpcov": "*",
         "phpunit/PHPUnit": "~4.0"
-    }
+    },
 }

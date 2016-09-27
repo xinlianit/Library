@@ -102,7 +102,7 @@ class Consumer
         if (is_null(self::$instance)) {
             self::$instance = new self($hostList, $timeout);
         }
-        
+
         return self::$instance;
     }
 

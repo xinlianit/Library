@@ -22,7 +22,6 @@ spl_autoload_register(function($className)
 	$classFile = $basePath . str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php';
 	if (function_exists('stream_resolve_include_path')) {
 		$file = stream_resolve_include_path($classFile);
-		echo $file . "文件\n";
 	} else {
 		$file = false;
 		foreach (explode(PATH_SEPARATOR, get_include_path()) as $path) {

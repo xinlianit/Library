@@ -28,7 +28,8 @@ require 'autoloader.php';
 $host = 'localhost';
 $zkPort  = 2181; //zookeeper
 $kPort   = 9092; //kafka server
-$topic   = 'test';
+//$topic   = 'test';
+$topic   = 'recom_page';
 $maxSize = 10000000;
 $socketTimeout = 2;
 
@@ -37,6 +38,7 @@ $partition = 0;
 $nMessages = 0;
 
 $consumer = new Kafka_SimpleConsumer($host, $kPort, $socketTimeout, $maxSize);
+
 while (true) {
 	try {
 		//create a fetch request for topic "test", partition 0, current offset and fetch size of 1MB
