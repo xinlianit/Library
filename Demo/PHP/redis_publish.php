@@ -19,7 +19,7 @@ $redisServer = RedisService::instance( '192.168.3.100' , '6379' , 'redis123' );
 $publish_result = $redisServer->publish( $channel_name , $message );
 
 if( $publish_result ){
-    echo "send Success !";
+    echo "send Success !\n";
 }else{
-    echo "send Fail!";
+    echo "send Fail!\n";
 }
