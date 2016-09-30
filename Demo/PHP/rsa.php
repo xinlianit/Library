@@ -33,7 +33,6 @@ $encrypt_result = $Rsa->encode( $data );
 //Rsa解密
 $decrypt_result = $Rsa->decode( $encrypt_result );
 
-
 echo '<h3>要加密的数据：</h3>';
 echo $data.'<br/>';
 

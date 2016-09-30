@@ -1,6 +1,10 @@
 <?php 
-$path = '/usr/lib/pear';
-set_include_path(get_include_path() . PATH_SEPARATOR . $path);
+$parn = (9527 / 10) % 8 + 1;
+$table = 9527 % 10;
+echo $parn;
+var_dump($table);
 
-echo include_path ;
+
+
+
 ?>
