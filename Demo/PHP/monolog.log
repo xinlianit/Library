@@ -1,0 +1,7 @@
+[2016-10-25 11:06:47] name.WARNING: Foo [] []
+[2016-10-25 11:06:47] name.ERROR: Bar [] []
+[2016-10-25 11:14:03] name.WARNING: Foo [] []
+[2016-10-25 11:14:03] name.ERROR: Bar [] []
+[2016-10-25 11:15:32] my_logger.INFO: My logger is now ready [] []
+[2016-10-25 11:19:40] my_logger.INFO: My logger is now ready [] []
+[2016-10-25 11:19:40] my_logger.INFO: Adding a new user {"username":"Seldaek"} []
