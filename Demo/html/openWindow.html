@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>openWindow示例</title>
+<link rel="stylesheet" href="./css/jquery-ui-1.10.3.full.min.css" type="text/css" media="all"></link>
+</head>
+<body>
+
+<a href="javascript:void(0);">默认弹框</a>
+
+
+
+<div id="dialog_default">
+	<p>你好！</p>
+</div>
+
+
+<script type="text/javascript" src="./js/sea.js"></script>
+<script type="text/javascript">
+seajs.config({
+	'base': './js',
+	'alias': {
+		'jquery': './js/jquery-1.7.2.min',
+		'jqueryUI': './js/jquery-ui-1.10.3.full.min',
+		'common': '/JavaScript/common',
+	}
+});
+
+seajs.use(['jquery','jqueryUI','common'],function(jquery,jqueryUI,common){
+	var dialog = {
+			id: 'dialog_default',
+	};
+	$.common.openWindow(dialog);
+});
+</script>
+</body>
+</html>

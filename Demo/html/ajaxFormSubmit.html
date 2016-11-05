@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ajaxFormSubmit ajax表单提交</title>
+<link rel="stylesheet" href="./css/jquery-ui-1.10.3.full.min.css" type="text/css" media="all"></link>
+<style type="text/css">
+	ul{list-style:none;}
+	ul li{margin:10px;}
+</style>
+</head>
+<body>
+
+<form id="form1" action="server/ajaxFrom.php" method="post" ajax="true" success="success_test">
+	<ul>
+		<li>
+			<label>
+				账号：
+				<input name="account" type="text" value="" />
+			</label>
+		</li>
+		<li>
+			<label>
+				密码：
+				<input name="pwd" type="password" value="" />
+			</label>
+		</li>
+		<li>
+			<label>
+				邮箱：
+				<input name="email" type="text" value="" />
+			</label>
+		</li>
+		<li>
+			<label>
+				网址：
+				<input name="url" type="text" value="" />
+			</label>
+		</li>
+		<li>
+			<label>
+				简介：
+				<textarea name="desc"></textarea>
+			</label>
+		</li>
+		<li>
+			性别：
+			<label>
+				<input name="sex" type="radio" value="1" />男
+			</label>
+			<label>
+				<input name="sex" type="radio" value="2" />女
+			</label>
+		</li>
+		<li>
+			爱好：
+			<label>
+				<input name="ah" type="checkbox" value="1" />游泳
+			</label>
+			<label>
+				<input name="ah" type="checkbox" value="2" />读书
+			</label>
+			<label>
+				<input name="ah" type="checkbox" value="3" />画画
+			</label>
+		</li>
+	</ul>
+	<input type="submit" value="提交" />
+	<input type="reset" value="重置" />
+</form>
+
+
+<script src="./js/sea.js"></script>
+<script src="./js/config/main.js"></script>
+<script type="text/javascript">
+
+
+seajs.use(['jquery','common','module/test','callback/ajaxFormSubmit'],function(jquery,common,test){
+	//加载ajax表单提交
+	$.common.ajaxFormSubmit();
+	
+});
+
+
+
+</script>
+
+</body>
+</html>
