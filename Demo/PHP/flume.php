@@ -9,6 +9,11 @@ try{
     $data = '{data:"' . $msg . '"}';
     $rs = $flume::push($data);
     
+    //发送flume失败
+    if(!$rs){
+        //本地调用日志接口写入，错误日志
+    }
+    
     var_dump($rs);
     
 }catch(Exception $e){
