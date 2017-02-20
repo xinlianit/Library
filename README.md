@@ -39,6 +39,7 @@
 							<dd>consumer.php-------------------------------------------------------rabbitMQ订阅消息（消费者-Linux控制台运行）</dd>
 						</dl>
 					</dd>
+                                        <dd>flume.php---------------------------------------------- 发送数据到 flume-ng 服务器</dd>
 				</dl>
 			</dd>
 		</dl>
@@ -51,6 +52,7 @@
 					<dd>Encrypt.class.php------------------------------------------------（AES & RSA）加密类</dd>
 					<dd>RedisService.class.php-------------------------------------------Redis 类</dd>
 					<dd>Sign.class.php---------------------------------------------------（RSA & md5|crypt|sha1|base64_encode）签名&验签类</dd>
+                                        <dd>Flume.class.php--------------------------------------------------- Flume-ng SDK for PHP</dd>
 				</dl>
 			</dd>
 	</dd>
