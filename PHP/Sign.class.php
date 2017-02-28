@@ -158,9 +158,10 @@ class Sign {
         ksort( $data );
         $sign_str = '';
         foreach( $data as $k => $v ){
+            $v = html_entity_decode($v);
             //过滤签名、空值、数组
             if( $k != $this->sign_key_name && $v != '' && !is_array($v) )
-                $sign_str .= $k . '=' . html_entity_decode( $v ) . '&';
+                $sign_str .= $k . '=' . str_replace('&quot;', '"', $v) . '&';
         }
         
         //拼接密钥
