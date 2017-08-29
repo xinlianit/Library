@@ -140,8 +140,8 @@ class Encrypt {
                     $this->_aes_mode = $allow_set_modes[$_mode];
             }
             
-            $this->_iv_size = mcrypt_get_iv_size( $this->_bit , $this->_aes_mode );
-            $this->_iv      = mcrypt_create_iv( $this->_iv_size , MCRYPT_RAND );
+            @$this->_iv_size = mcrypt_get_iv_size( $this->_bit , $this->_aes_mode );
+            @$this->_iv      = mcrypt_create_iv( $this->_iv_size , MCRYPT_RAND );
         }
             
         //RSA加密设置
@@ -219,9 +219,9 @@ class Encrypt {
      */
     private function aesEncode($data){
         if( $this->_aes_mode === MCRYPT_MODE_ECB )
-            $encode_str = mcrypt_encrypt( $this->_bit , self::$secret_key , $data , $this->_aes_mode );
+            @$encode_str = mcrypt_encrypt( $this->_bit , self::$secret_key , $data , $this->_aes_mode );
         else
-            $encode_str = mcrypt_encrypt( $this->_bit , self::$secret_key , $data , $this->_aes_mode , $this->_iv );
+            @$encode_str = mcrypt_encrypt( $this->_bit , self::$secret_key , $data , $this->_aes_mode , $this->_iv );
         
         //十六进制流转字符串    
         $encode_str = $this->hexToString( $encode_str );
@@ -245,9 +245,9 @@ class Encrypt {
         $data = $this->stringToHex( $data );
             
         if( $this->_aes_mode === MCRYPT_MODE_ECB )
-            $decode_string = mcrypt_decrypt( $this->_bit , self::$secret_key , $data , $this->_aes_mode );
+            @$decode_string = mcrypt_decrypt( $this->_bit , self::$secret_key , $data , $this->_aes_mode );
         else 
-            $decode_string = mcrypt_decrypt( $this->_bit , self::$secret_key , $data , $this->_aes_mode , $this->_iv );
+            @$decode_string = mcrypt_decrypt( $this->_bit , self::$secret_key , $data , $this->_aes_mode , $this->_iv );
         
         return $decode_string;
     }

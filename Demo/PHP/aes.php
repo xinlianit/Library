@@ -29,6 +29,13 @@ $encrypt_result = $Aes->encode( $data );
 //AES解密
 $decrypt_result = $Aes->decode( $encrypt_result );
 
+$en_str = 'FfSl5QxZH/WjzNjfLA0Lv7JTHtFJz5iXJQuaXaRX9Eo=';
+$decrypt_result1 = $Aes->decode( $en_str );
+
+var_dump($decrypt_result1);
+
+
+
 
 echo '<h3>秘钥：</h3>';
 echo md5('ABC').'<br/>';
