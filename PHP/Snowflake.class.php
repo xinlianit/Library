@@ -61,7 +61,7 @@ abstract class Snowflake {
         if($next_number === null) return false;
         
         // 当前时间戳(ms)
-        $now_time_stamp = self::nowTimeStamp();
+        $now_time_stamp = self::currentTimeStamp();
         
         // 运行时长 = 当前时间戳 - 开始时间戳
         $time_long = $now_time_stamp - self::START_EPOCH;
@@ -108,7 +108,7 @@ abstract class Snowflake {
      * 获取当前时间戳;(毫秒：ms)
      * @return int
      */
-    private static function nowTimeStamp(){
+    private static function currentTimeStamp(){
         return floor(microtime(true) * 1000);
     }
     
@@ -118,7 +118,7 @@ abstract class Snowflake {
      */
     private static function nextNumber(){
         // 取时 - 获取可用毫秒
-        $timeStamp = self::nowTimeStamp();
+        $timeStamp = self::currentTimeStamp();
         
         // 队列键
         $used_key = "t_".$timeStamp;
