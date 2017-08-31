@@ -25,10 +25,27 @@ abstract class Snowflake {
     const MARK_BITS = 0;
     
     /**
+     * 机器ID位数；0:支持1台、2:支持3台、3：支持7台、4：支持15台....   最多10位；支持1024台
+     */
+    const MACHINE_BITS = 4;
+    
+    /**
+     * 毫秒内生成ID计数
+     * @var int
+     */
+    private static $count = 0;
+    
+    /**
+     * 毫秒内已用号码：当前毫秒 => 当前序号数组队列
+     * @var array
+     */
+    private static $time_stamp_used = [];
+    
+    /**
      * 生成唯一ID
-     * @param int $machine_id   机器配置ID；最多支持1024台机器，0-1023；1023 = 1111 1111 11(10位正常)，1024 = 1000 0000 000（11位超出） 
-     * @return int              唯一码
-     * @throws Exception        1、机器号溢出
+     * @param int $machine_id       机器配置ID；最多支持1024台机器，0-1023；1023 = 1111 1111 11(10位正常)，1024 = 1000 0000 000（11位超出） 
+     * @return int                  唯一ID
+     * @throws Exception            1、机器号溢出
      */
     public static function makeUniqueId($machine_id=0){
         // 机器ID校验
@@ -36,8 +53,15 @@ abstract class Snowflake {
             throw new Exception("machine id overflow!");
         }
         
+        // 取号
+        //$next_number = mt_rand(0, self::MAX_RANDOM_NUMBER);             // 随机取号(重复几率5%)
+        $next_number = self::nextNumber();    //顺序取号（重复几率为 0）
+        
+        // 取号失败
+        if($next_number === null) return false;
+        
         // 当前时间戳(ms)
-        $now_time_stamp = floor(microtime(true) * 1000);
+        $now_time_stamp = self::nowTimeStamp();
         
         // 运行时长 = 当前时间戳 - 开始时间戳
         $time_long = $now_time_stamp - self::START_EPOCH;
@@ -45,11 +69,12 @@ abstract class Snowflake {
         // 41bits 时间戳 = 运行时长 + 最大时间戳
         $time_stamp_41bits = decbin($time_long + self::MAX_TIME_STAMP);
         
-        // 10bits 机器配置ID
-        $machine_id_10bits = str_pad(decbin($machine_id), 10, "0", STR_PAD_LEFT);
+        // 0-10bits 机器配置ID
+        $machine_id_10bits = self::MACHINE_BITS == 0 ? '' : str_pad(decbin($machine_id), self::MACHINE_BITS, "0", STR_PAD_LEFT);
         
         // 12bits 随机序列号
-        $random_number_12bits = str_pad(decbin(mt_rand(0, self::MAX_RANDOM_NUMBER)), 12, "0", STR_PAD_LEFT);
+        //$random_number_12bits = str_pad(decbin($next_number), 12, "0", STR_PAD_LEFT);
+        $random_number_12bits = decbin($next_number);
         
         // 64bits 结果码 = 符号位（1） '+' 时间戳（41） '+' 机器ID（10） '+' 自增序号（12）
         $result_64bits = self::MARK_BITS . $time_stamp_41bits . $machine_id_10bits . $random_number_12bits;
@@ -77,5 +102,51 @@ abstract class Snowflake {
         $time_stamp = bindec(substr($result_64bits, 0, 41)) - self::MAX_TIME_STAMP + self::START_EPOCH;
         
         return $time_stamp;
+    }
+    
+    /**
+     * 获取当前时间戳;(毫秒：ms)
+     * @return int
+     */
+    private static function nowTimeStamp(){
+        return floor(microtime(true) * 1000);
+    }
+    
+    /**
+     * 获取毫秒内的下一个序列号码
+     * @return int
+     */
+    private static function nextNumber(){
+        // 取时 - 获取可用毫秒
+        $timeStamp = self::nowTimeStamp();
+        
+        // 队列键
+        $used_key = "t_".$timeStamp;
+        
+         // 毫秒内是否获取该号
+        if(!array_key_exists($used_key, self::$time_stamp_used)){
+            // 初始化队列
+            self::$time_stamp_used = [$used_key => []];
+        }
+        
+        // 获取下一个序号
+        $next_number = self::$count;
+        
+        // 毫秒内是否获取该号
+        if(in_array($next_number, self::$time_stamp_used[$used_key])) return null;
+        
+        // 加入到已使用队列
+        array_push(self::$time_stamp_used[$used_key], $next_number);
+        
+        // 当前没有可用的号
+        if(self::$count+1 > self::MAX_RANDOM_NUMBER){
+            self::$count = 0;
+            return null;
+        }
+        
+        // 自增序号
+        self::$count++;
+        
+        return $next_number;
     }
 }
